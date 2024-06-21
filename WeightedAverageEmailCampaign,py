@@ -1,0 +1,25 @@
+'''
+Measure campaign effectiveness. 
+Marketing team needs
+User data collections.
+    open_rate = 0.3
+    click_rate = 0.7
+weight average score ( across campaign_id )
+campaign_id is unique : open,clicks are averaged out ( weighted equations modeling )
+
+'''
+import numpy as np
+import pandas as pd
+
+def weighted_average_email_campaign(email_campaigns: pd.DataFrame):
+    weightedAvgSeries = (email_campaigns['num_opens'].astype(float).mul(0.3) + email_campaigns['num_clicks'].astype(float).mul(0.7) ) / email_campaigns['num_users'].astype(float)
+    # print(weightedAvgSeries)
+    # print(type(weightedAvgSeries))
+    weightedAvgSeriesRound = weightedAvgSeries.astype(float).round(decimals=2).rename('weighted_avg')
+    # df = email_campaigns['campaign_name'].to_frame().join(weightedAvgSeriesRound)
+    # Both series have 0 indexing here
+    # print(email_campaigns['campaign_name'])
+    names = email_campaigns['campaign_name'].rename('campaign_name')
+    # print(weightedAvgSeriesRound)
+    df = pd.concat([names, weightedAvgSeriesRound], axis=1)
+    return df
