@@ -1,0 +1,8 @@
+import pandas as pd
+
+def update_availability(book_id: int, copies: int, df_books: pd.DataFrame) -> pd.DataFrame:
+    idxToUpdateList = list(df_books[df_books['book_id'] == book_id].index.values)
+    if(len(idxToUpdateList) > 0):
+        idxToUpdate = idxToUpdateList[0]
+        df_books.at[idxToUpdate,'copies_available'] = copies
+    return df_books
