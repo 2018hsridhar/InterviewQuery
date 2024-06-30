@@ -33,7 +33,7 @@ def liked_pages(friends: pd.DataFrame, page_likes: pd.DataFrame):
     friendsPageTable = userFriendsPageLikes
     count_friends = pd.NamedAgg(column="friend_id", aggfunc="count")
     pagesByLikesOfUserFriends = friendsPageTable.groupby(['page_id','user_id_x']).agg(num_friend_likes = count_friends).reset_index()
-    pagesByLikesOfUserFriends.rename(columns={'user_id_x':'user_id'},inplace=True)\
+    pagesByLikesOfUserFriends.rename(columns={'user_id_x':'user_id'},inplace=True)
     
     # [2] Get pages a user liked, which are liked by a users friends, but not by the user itself
     pagesFriendsLike = userFriendsPageLikes.groupby('user_id_x')['page_id'].apply(list).reset_index(name='friend_liked_pages')
