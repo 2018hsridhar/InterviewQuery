@@ -1,0 +1,20 @@
+# A very function based language
+# Return median value of list
+# All non-empty lists
+# objects in indexed positions in lists
+# https://www.interviewquery.com/questions/median-o-of-1
+library(plyr)
+
+median <- function(li){
+   listLen = length(li)
+   result = 0
+   if(listLen %% 2 == 0) {
+      leftIdx <- listLen / 2
+      rightIdx <- leftIdx + 1
+      result = (li[[leftIdx]] + li[[rightIdx]] ) / 2
+   } else {
+      targetIdx <- (listLen + 1) / 2
+      result = li[[targetIdx]]
+   }
+   return(result)
+}
