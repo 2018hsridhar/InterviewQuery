@@ -21,20 +21,18 @@ def best_performing_advertisers(advertisers: pd.DataFrame, revenue: pd.DataFrame
     # convert arg to date time ain't in place
     weeklyRevenue['transaction_date'] = pd.to_datetime(weeklyRevenue['transaction_date'])
     weeklyRevenue['week'] = weeklyRevenue['transaction_date'].dt.isocalendar().week
-    # amountAgg = pd.NamedAgg(column='amount',aggfunc='sum')
-    # weeklyRevenue = weeklyRevenue.groupby('week').agg(weeklyAmount = amountAgg)
-    weeklyRevenue['weeklyAmount'] = weeklyRevenue.groupby(['week','advertiser_id'])['amount'].transform(np.sum)
-    # print(weeklyRevenue)
+    weeklyRevenue['weeklyAmountByAdvertiser'] = weeklyRevenue.groupby(['advertiser_id','week'])['amount'].transform(np.sum)
+    weeklyRevenue['maxWeeklyAmountByAdvertiser'] = weeklyRevenue.groupby(['week'])['weeklyAmountByAdvertiser'].transform(np.max)
+    print(weeklyRevenue[['advertiser_id','week','weeklyAmountByAdvertiser','maxWeeklyAmountByAdvertiser']])
     # it's not the actual max weekly revenue -> it's the max revenue ( per week )
     # w1 : (a1,...,an) the best and w2 : (a1,...,an) the best thing
 
-    maxWeeklyRevenue = weeklyRevenue['weeklyAmount'].max()
+    # maxWeeklyRevenue = weeklyRevenue['weeklyAmountByAdvertiser'].max()
 
     # STEP [2] Solve for the advertisers with said max weekly revenues
-    print(weeklyRevenue)
-    bestAdvertisers = weeklyRevenue[weeklyRevenue['weeklyAmount'] == maxWeeklyRevenue]
-    bestAdvertisers = bestAdvertisers['advertiser_id'].unique()
+    bestAdvertisers = weeklyRevenue[weeklyRevenue['weeklyAmountByAdvertiser'] == weeklyRevenue['maxWeeklyAmountByAdvertiser']]
     print(bestAdvertisers)
+    bestAdvertisers = bestAdvertisers['advertiser_id'].unique()
     advList = list(bestAdvertisers)
     bestAdvertisersTrans = weeklyRevenue.loc[weeklyRevenue['advertiser_id'].isin(advList)]
     # print(bestAdvertisersTrans)
@@ -42,7 +40,7 @@ def best_performing_advertisers(advertisers: pd.DataFrame, revenue: pd.DataFrame
     bestAdvertisersTrans = bestAdvertisersTrans.groupby('advertiser_id').head(3)
     bestAdvertisersTrans = pd.merge(bestAdvertisersTrans,advertisers,how='inner',left_on='advertiser_id',right_on='advertiser_id')
     # print(bestAdvertisers)
-    bestAdvertisersTrans.drop(columns=['week','advertiser_id','weeklyAmount'],inplace=True)
+    bestAdvertisersTrans.drop(columns=['week','advertiser_id','weeklyAmountByAdvertiser'],inplace=True)
     bestAdvertisersTrans['transaction_date'] = pd.to_datetime(bestAdvertisersTrans['transaction_date']).dt.date
     # , format='[%d/%b/%Y:%H:%M:%S', errors='coerce')
     # pd.to_datetime(bestAdvertisersTrans['transaction_date'])
